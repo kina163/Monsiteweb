@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Support</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7f6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body.dark-mode {
+      background-color: #121212;
+      color: white;
+    }
+
+    .section {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 15px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: background 0.3s;
+    }
+
+    body.dark-mode .section {
+      background: #333;
+    }
+
+    input {
+      width: 70%;
+      padding: 8px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 15px;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button {
+      padding: 8px 12px;
+      margin: 5px;
+      background: #6200ea;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #3700b3;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    li {
+      background: #eee;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: left;
+    }
+
+    .delete-btn {
+      background: red;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 3px;
+    }
+
+    .delete-btn:hover {
+      background: #b71c1c;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Langue et Mode -->
+<div class="section">
+  <button onclick="toggleLanguage('fr')">Français</button>
+  <button onclick="toggleLanguage('en')">English</button>
+  <button onclick="toggleLanguage('es')">Español</button>
+  <button onclick="toggleLanguage('de')">Deutsch</button>
+  <button onclick="toggleLanguage('pt')">Português</button>
+  <button onclick="toggleDarkMode()">Mode Sombre/Clair</button>
+</div>
+
+<!-- Page du Service Support -->
+<div class="section" id="serviceSupport">
+  <h2 id="serviceSupportTitle">Service Support</h2>
+  <input type="email" id="email" placeholder="Adresse Gmail" /><br>
+  <div class="input-group">
+    <input type="password" id="password" placeholder="Mot de passe" />
+    <button type="button" onclick="toggleVisibility('password', this)">Afficher</button>
+  </div>
+  <button onclick="allerEnregistrement()">Suivant</button>
+</div>
+
+<!-- Page d'enregistrement des mots de passe -->
+<div class="section" id="enregistrement" style="display:none;">
+  <h2 id="enregistrementTitle">Enregistrement</h2>
+  <div class="input-group">
+    <input type="password" id="newPassword" placeholder="Mot de passe" />
+    <button type="button" onclick="toggleVisibility('newPassword', this)">Afficher</button>
+  </div>
+  <div class="input-group">
+    <input type="password" id="confirmPassword" placeholder="Répéter" />
+    <button type="button" onclick="toggleVisibility('confirmPassword', this)">Afficher</button>
+  </div>
+  <button onclick="enregistrer()">Enregistrer</button>
+</div>
+
+<!-- Page d'authentification -->
+<div class="section" id="authentication" style="display:none;">
+  <h2 id="authTitle">Authentification</h2>
+  <input type="password" id="authPassword" placeholder="Entrez le mot de passe" />
+  <button onclick="authentifier()">Se connecter</button>
+</div>
+
+<!-- Affichage des mots de passe enregistrés -->
+<div class="section" id="affichage" style="display:none;">
+  <h2 id="affichageTitle">Mots de passe enregistrés</h2>
+  <ul id="listeMots"></ul>
+  <button onclick="toutSupprimer()">Supprimer tout</button>
+</div>
+
+<script>
+// Langues
+const messages = {
+  fr: {
+    serviceSupport: "Service Support",
+    emailPlaceholder: "Adresse Gmail",
+    passwordPlaceholder: "Mot de passe",
+    enregistrer: "Enregistrer",
+    confirmer: "Répéter",
+    authTitle: "Authentification",
+    affichageTitle: "Mots de passe enregistrés",
+    supprimerTout: "Supprimer tout",
+    motDePasseIncorrect: "Mot de passe incorrect!",
+    motsDePasse: "Les mots de passe ne correspondent pas!",
+    tousSupprimer: "Voulez-vous vraiment tout supprimer ?"
+  },
+  en: {
+    serviceSupport: "Service Support",
+    emailPlaceholder: "Gmail Address",
+    passwordPlaceholder: "Password",
+    enregistrer: "Save",
+    confirmer: "Confirm",
+    authTitle: "Authentication",
+    affichageTitle: "Saved Passwords",
+    supprimerTout: "Delete All",
+    motDePasseIncorrect: "Incorrect password!",
+    motsDePasse: "Passwords do not match!",
+    tousSupprimer: "Do you really want to delete everything?"
+  },
+  es: {
+    serviceSupport: "Soporte de servicio",
+    emailPlaceholder: "Dirección de Gmail",
+    passwordPlaceholder: "Contraseña",
+    enregistrer: "Guardar",
+    confirmer: "Confirmar",
+    authTitle: "Autenticación",
+    affichageTitle: "Contraseñas guardadas",
+    supprimerTout: "Eliminar todo",
+    motDePasseIncorrect: "¡Contraseña incorrecta!",
+    motsDePasse: "¡Las contraseñas no coinciden!",
+    tousSupprimer: "¿Realmente deseas eliminar todo?"
+  },
+  de: {
+    serviceSupport: "Kundendienst",
+    emailPlaceholder: "Gmail-Adresse",
+    passwordPlaceholder: "Passwort",
+    enregistrer: "Speichern",
+    confirmer: "Bestätigen",
+    authTitle: "Authentifizierung",
+    affichageTitle: "Gespeicherte Passwörter",
+    supprimerTout: "Alles löschen",
+    motDePasseIncorrect: "Falsches Passwort!",
+    motsDePasse: "Passwörter stimmen nicht überein!",
+    tousSupprimer: "Möchten Sie wirklich alles löschen?"
+  },
+  pt: {
+    serviceSupport: "Suporte ao Serviço",
+    emailPlaceholder: "Endereço do Gmail",
+    passwordPlaceholder: "Senha",
+    enregistrer: "Salvar",
+    confirmer: "Confirmar",
+    authTitle: "Autenticação",
+    affichageTitle: "Senhas Salvas",
+    supprimerTout: "Deletar Tudo",
+    motDePasseIncorrect: "Senha incorreta!",
+    motsDePasse: "As senhas não coincidem!",
+    tousSupprimer: "Você realmente deseja excluir tudo?"
+  }
+};
+
+let currentLang = 'fr';
+
+function toggleLanguage(lang) {
+  currentLang = lang;
+  document.getElementById('serviceSupportTitle').innerText = messages[lang].serviceSupport;
+  document.getElementById('email').placeholder = messages[lang].emailPlaceholder;
+  document.getElementById('password').placeholder = messages[lang].passwordPlaceholder;
+  document.getElementById('newPassword').placeholder = messages[lang].enregistrer;
+  document.getElementById('confirmPassword').placeholder = messages[lang].confirmer;
+  document.getElementById('authTitle').innerText = messages[lang].authTitle;
+  document.getElementById('affichageTitle').innerText = messages[lang].affichageTitle;
+  document.getElementById('listeMots').innerHTML = '';
+  document.getElementById('supprimerTout').innerText = messages[lang].supprimerTout;
+}
+
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+}
+
+function toggleVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (input.type === "password") {
+    input.type = "text";
+    btn.textContent = "Cacher";
+  } else {
+    input.type = "password";
+    btn.textContent = "Afficher";
+  }
+}
+
+function allerEnregistrement() {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  if (!email || !password) {
+    alert(messages[currentLang].motsDePasse);
+    return;
+  }
+  localStorage.setItem('emailTemp', email);
+  localStorage.setItem('passwordTemp', password);
+  document.getElementById('serviceSupport').style.display = "none";
+  document.getElementById('enregistrement').style.display = "block";
+}
+
+function enregistrer() {
+  const mot1 = document.getElementById('newPassword').value;
+  const mot2 = document.getElementById('confirmPassword').value;
+  if (!mot1 || mot1 !== mot2) {
+    alert(messages[currentLang].motsDePasse);
+    return;
+  }
+
+  let utilisateurs = JSON.parse(localStorage.getItem('utilisateurs')) || [];
+  utilisateurs.push({
+    email: localStorage.getItem('emailTemp'),
+    motDePasse: mot1
+  });
+  localStorage.setItem('utilisateurs', JSON.stringify(utilisateurs));
+  localStorage.removeItem('emailTemp');
+  localStorage.removeItem('passwordTemp');
+  
+  document.getElementById('enregistrement').style.display = "none";
+  document.getElementById('authentication').style.display = "block";
+}
+
+function authentifier() {
+  const enteredPassword = document.getElementById('authPassword').value;
+  if (enteredPassword === "support1234") {
+    document.getElementById('authentication').style.display = "none";
+    document.getElementById('affichage').style.display = "block";
+    afficherMots();
+  } else {
+    alert(messages[currentLang].motDePasseIncorrect);
+  }
+}
+
+function afficherMots() {
+  const liste = document.getElementById('listeMots');
+  liste.innerHTML = "";
+  const utilisateurs = JSON.parse(localStorage.getItem('utilisateurs')) || [];
+  utilisateurs.forEach((u, index) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>Email:</strong> ${u.email}<br><strong>Mot de passe:</strong> ${u.motDePasse} 
+                   <button class="delete-btn" onclick="supprimerMotDePasse(${index})">Supprimer</button>`;
+    liste.appendChild(li);
+  });
+}
+
+function supprimerMotDePasse(index) {
+  let utilisateurs = JSON.parse(localStorage.getItem('utilisateurs')) || [];
+  utilisateurs.splice(index, 1);
+  localStorage.setItem('utilisateurs', JSON.stringify(utilisateurs));
+  afficherMots();
+}
+
+function toutSupprimer() {
+  if (confirm(messages[currentLang].tousSupprimer)) {
+    localStorage.removeItem('utilisateurs');
+    afficherMots();
+  }
+}
+</script>
+
+</body>
+</html>
